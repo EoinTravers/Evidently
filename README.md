@@ -13,6 +13,12 @@ It provides
   the likelihood of real data under a given model/set of parameters,
   allowing parameter estimation and model comparision.
 
+See [eointravers.com/code/accumulate/](http://eointravers.com/code/accumulate/) for documentation.
+
+
+
+
+## Basic Use
 
 ```python
 import pandas as pd
@@ -20,17 +26,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
-```
-
-
-```python
-%load_ext autoreload
-%autoreload 2
 import accumulate as accum
 ```
-
-## Basic Use
 
 ## Set up a model and provide parameters
 
@@ -66,7 +63,6 @@ model.describe_parameters()
 
 ```python
 %time X, responses, rts = model.do_dataset(n=1000)
-# X, responses, rts = model.do_dataset(n=1000)
 ```
 
     CPU times: user 630 ms, sys: 80.3 ms, total: 711 ms
@@ -86,19 +82,6 @@ X.head()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -299,13 +282,6 @@ accum.viz.plot_trace_mean(model, X, ax=ax) # Plots simulations
 ```
 
 
-
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f11368a2dd0>
-
-
-
-
 ![png](./README_files/README_13_1.png)
 
 
@@ -315,17 +291,6 @@ ax = accum.viz.setup_ddm_plot(model)
 accum.viz.plot_traces(model, X, responses, rts, ax=ax, 
                       terminate=True, show_mean=True) # Show raw data
 ```
-
-    /home/eoin/GitHub/Accumulate/accumulate/viz.py:183: RuntimeWarning: invalid value encountered in greater
-      X.iloc[i, t > rt] = np.nan
-
-
-
-
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f11395c5190>
-
-
 
 
 ![png](./README_files/README_14_2.png)
@@ -341,13 +306,6 @@ plt.legend()
 ```
 
 
-
-
-    <matplotlib.legend.Legend at 0x7f113735b290>
-
-
-
-
 ![png](./README_files/README_15_1.png)
 
 
@@ -358,16 +316,7 @@ ax = accum.viz.setup_ddm_plot(model, time_range=(-2, 0))
 accum.viz.plot_traces(model, mX, responses, rts, ax=ax, show_mean=True)
 ```
 
-
-
-
-    <matplotlib.axes._subplots.AxesSubplot at 0x7f11368c6d90>
-
-
-
-
 ![png](./README_files/README_16_1.png)
-
 
 
 ```python
@@ -378,13 +327,6 @@ for resp in [1, -1]:
     accum.viz.plot_trace_mean(model, resp_mX, ax=ax, label='Response: %i' % resp)
 plt.legend()
 ```
-
-
-
-
-    <matplotlib.legend.Legend at 0x7f11369b7f10>
-
-
 
 
 ![png](./README_files/README_17_1.png)
