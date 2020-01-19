@@ -3,15 +3,6 @@
 .. mdinclude:: ../README.md
 
 
-Documentation
-=============
-.. toctree::
-   :maxdepth: 2
-
-   Introduction
-
-
-
 API
 ========
 .. toctree::

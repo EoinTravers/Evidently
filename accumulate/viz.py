@@ -7,22 +7,27 @@ import matplotlib as mpl
 from . import utils
 from .utils import lock_to_movement
 
+
+'''
+Visualisation functions
+'''
+
 def configure_mpl():
     '''Configures global matplotlib settings to better defaults
 
-    sns.set_style('whitegrid')
-    mpl.rcParams['font.size'] = 20
-    mpl.rcParams['axes.titlesize'] = 'medium'
-    mpl.rcParams['axes.labelsize'] = 'medium'
-    mpl.rcParams['xtick.labelsize'] = 'medium'
-    mpl.rcParams['ytick.labelsize'] = 'medium'
-    mpl.rcParams['legend.fontsize'] = 'medium'
-    mpl.rcParams['figure.titlesize'] = 'medium'
-    mpl.rcParams['figure.figsize'] = (8, 6)
-    mpl.rcParams['axes.spines.right'] = False
-    mpl.rcParams['axes.spines.top'] = False
-    mpl.rcParams['axes.edgecolor'] = 'k'
-    mpl.rcParams['svg.fonttype'] = 'none'
+    | sns.set_style('whitegrid')
+    | mpl.rcParams['font.size'] = 20
+    | mpl.rcParams['axes.titlesize'] = 'medium'
+    | mpl.rcParams['axes.labelsize'] = 'medium'
+    | mpl.rcParams['xtick.labelsize'] = 'medium'
+    | mpl.rcParams['ytick.labelsize'] = 'medium'
+    | mpl.rcParams['legend.fontsize'] = 'medium'
+    | mpl.rcParams['figure.titlesize'] = 'medium'
+    | mpl.rcParams['figure.figsize'] = (8, 6)
+    | mpl.rcParams['axes.spines.right'] = False
+    | mpl.rcParams['axes.spines.top'] = False
+    | mpl.rcParams['axes.edgecolor'] = 'k'
+    | mpl.rcParams['svg.fonttype'] = 'none'
     '''
     sns.set_style('whitegrid')
     mpl.rcParams['font.size'] = 20
@@ -44,6 +49,7 @@ def strip_ytick_labs():
 
 def setup_ddm_plot(model, ax=None,
                    time_range=None, threshold=None):
+    '''Set up background for a two-boundary DDM plot'''
     if ax is None:
         fig, ax = plt.subplots()
     else:
@@ -67,6 +73,7 @@ def setup_ddm_plot(model, ax=None,
 
 def setup_race_plot(model, ax=None,
                    time_range=None, threshold=None):
+    '''Set up background for a Race plot'''
     if ax is None:
         fig, ax = plt.subplots()
     else:
@@ -87,36 +94,6 @@ def setup_race_plot(model, ax=None,
     plt.hlines(0, *plt.xlim(), linestyle='dotted')
     return ax
 
-
-# def plot_single_trial_onetrace(model, pars=None):
-#     if pars is None:
-#         pars = model.pars
-#     x, resp, rt = model._do_trial(pars)
-#     t = np.arange(0, model.max_time, model.dt)
-#     ax = setup_ddm_plot(model)
-#     plt.plot(t, x)
-#     return ax
-
-def plot_Xs(Xs, colours = ['g', 'b'], labels=['One', 'Two']):
-    for i, X in enumerate(Xs):
-        for j in range(1, X.shape[0]):
-            plt.plot(X.iloc[j], alpha=.5, color=colours[i], label='__none__')
-        plt.plot(X.iloc[0], alpha=.5, color=colours[i], label=labels[i])
-    plt.legend()
-    plt.ylim(0, 1.)
-
-def plot_X_diff(Xs):
-    dX = Xs[0] - Xs[1]
-    for j in range(0, dX.shape[0]):
-        plt.plot(dX.iloc[j], alpha=.5, color='b')
-    plt.ylim(-1, 1.)
-
-def plot_kde(x, *args, **kwargs):
-    raise NotImplementedError('fixme!')
-    # bw = bw_silverman(x) # From utils?!
-    # kde = stats.gaussian_kde(x, bw_method='silverman')
-    # t = np.arange(0, 5000, 20)
-    # plt.plot(t, kde.evaluate(t))
 
 
 # Complex Visualisation Functions
@@ -210,7 +187,9 @@ def quickplot(X, n=20, times=None):
     for i in range(n):
         plt.plot(times, X[i], alpha=.2, color='b')
 
-## Some incomplete model-specific plots
+##  ##  ##  ##  ##  #
+## High-level plots #
+##  ##  ##  ##  ##  #
 
 def visualise_ddm(model, model_type='ddm',
                   measure='means',
@@ -279,6 +258,39 @@ def visualise_ddm(model, model_type='ddm',
     plt.title('Response-locked signals')
     return fig, axes
 
+##  ##  ##  ##  ##
+## Old functions #
+##  ##  ##  ##  ##
+
+# def plot_single_trial_onetrace(model, pars=None):
+#     if pars is None:
+#         pars = model.pars
+#     x, resp, rt = model._do_trial(pars)
+#     t = np.arange(0, model.max_time, model.dt)
+#     ax = setup_ddm_plot(model)
+#     plt.plot(t, x)
+#     return ax
+
+def plot_Xs(Xs, colours = ['g', 'b'], labels=['One', 'Two']):
+    for i, X in enumerate(Xs):
+        for j in range(1, X.shape[0]):
+            plt.plot(X.iloc[j], alpha=.5, color=colours[i], label='__none__')
+        plt.plot(X.iloc[0], alpha=.5, color=colours[i], label=labels[i])
+    plt.legend()
+    plt.ylim(0, 1.)
+
+def plot_X_diff(Xs):
+    dX = Xs[0] - Xs[1]
+    for j in range(0, dX.shape[0]):
+        plt.plot(dX.iloc[j], alpha=.5, color='b')
+    plt.ylim(-1, 1.)
+
+def plot_kde(x, *args, **kwargs):
+    raise NotImplementedError('fixme!')
+    # bw = bw_silverman(x) # From utils?!
+    # kde = stats.gaussian_kde(x, bw_method='silverman')
+    # t = np.arange(0, 5000, 20)
+    # plt.plot(t, kde.evaluate(t))
 
 def _plot_race_results(X1, X2, responses, rts, n=25, lines=True, means=True):
     times = np.arange(0, 5, .001)

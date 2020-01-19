@@ -2,24 +2,6 @@ import pandas as pd
 import numpy as np
 from sklearn.neighbors.kde import KernelDensity
 from numba import jit, njit
-# import matplotlib.pyplot as plt
-# import seaborn as sns
-
-# from main import *
-# import viz
-
-# def trace_to_df(X, dt=.001):
-#     '''Depreciated.'''
-#     if len(X.shape) == 2:
-#         res = pd.DataFrame(X)
-#         res.columns = X.columns * dt
-#     else:
-#         # Return list of data frames
-#         res = []
-#         for i in range(X.shape[2]):
-#             x = trace_to_df(X[:, :, i], dt=dt)
-#             res.append(x)
-#     return res
 
 def do_dataset_no_stimuli(model, n: int, *args, **kwargs):
     '''Simulate a dataset for a model that does not take trial-by-trial inputs.
@@ -185,6 +167,9 @@ def generate_randoms(means: list, sds: list, n=None, dist='normal'):
         n: How many values to sample (None or int)
         dist: Distribution to use. String, or list of length k.
               Accepted values so far are 'normal' and 'gamma'.
+
+    Returns:
+        List of np.ndarray: A list of randomly sampled values.
     '''
     k = len(means)
     assert len(sds) == k
