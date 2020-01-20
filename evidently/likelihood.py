@@ -5,10 +5,21 @@ import matplotlib as mpl
 from scipy import stats
 
 from sklearn.neighbors.kde import KernelDensity
-from statsmodels.nonparametric.bandwidths import bw_silverman
 
-from sklearn.neighbors.kde import KernelDensity
-from statsmodels.nonparametric.bandwidths import bw_silverman
+# Stolen from
+# https://www.statsmodels.org/stable/_modules/statsmodels/nonparametric/bandwidths.html#bw_silverman
+# to save a dependency.
+
+def _select_sigma(X):
+    normalize = 1.349
+    IQR = (sap(X, 75) - sap(X, 25))/normalize
+    return np.minimum(np.std(X, axis=0, ddof=1), IQR)
+
+def bw_silverman(x, kernel=None):
+    A = _select_sigma(x)
+    n = len(x)
+    return .9 * A * n ** (-0.2)
+
 
 def eval_with_kde(x, y):
     """Silverman Epanechnikov kernel"""

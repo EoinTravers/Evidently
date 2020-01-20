@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Accumulator'
+project = 'Evidently'
 copyright = '2020, Eoin Travers'
 author = 'Eoin Travers'
 

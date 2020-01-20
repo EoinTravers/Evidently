@@ -1,7 +1,7 @@
 
-# Accumulate: Simulate Evidence Accumulation Models in Python
+# Evidently: Simulate Evidence Accumulation Models in Python
 
-`Accumulate` is a python package for working with evidence accumulation models.
+`Evidently` is a python package for working with evidence accumulation models.
 
 It provides
 
@@ -13,7 +13,7 @@ It provides
   the likelihood of real data under a given model/set of parameters,
   allowing parameter estimation and model comparision.
 
-See [eointravers.com/code/accumulate/](http://eointravers.com/code/accumulate/) for documentation.
+See [eointravers.com/code/evidently/](http://eointravers.com/code/evidently/) for documentation.
 
 
 
@@ -26,7 +26,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 import sys
-import accumulate as accum
+import evidently as accum
 ```
 
 ## Set up a model and provide parameters
@@ -273,7 +273,7 @@ print(rts[:5])
 
 ## Visualise
 
-The `accumulate.viz` submodule contains a collection of `matplotlib`-based functions for visualising model simulations. Here are a few examples.
+The `evidently.viz` submodule contains a collection of `matplotlib`-based functions for visualising model simulations. Here are a few examples.
 
 
 ```python

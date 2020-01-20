@@ -129,10 +129,7 @@ def random_gamma(mean: float, sd: float, n=None):
     shape = mean**2 / var
     scale = var / mean
     x = np.random.gamma(shape, scale, n)
-    if len(x) == 1:
-        return x[0]
-    else:
-        return x
+    return x
 
 def random_normal(mean: float, sd: float, n=None):
     '''np.random.normal(loc=mean, scale=sd, size=n)'''
