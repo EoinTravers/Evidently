@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name="evidently",
-    version="0.0.1-alpha",
+    version="0.0.1",
     author="Eoin Travers",
     author_email="eoin.travers@gmail.com",
     description="Efficient simulation of evidence accumulation models.",

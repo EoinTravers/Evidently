@@ -56,6 +56,13 @@ Heirarchical Diffusion
       :undoc-members:
       :show-inheritance:
 
+Others
+------
+.. autoclass:: evidently.models.Schurger
+      :members:
+      :undoc-members:
+      :show-inheritance:
+
 
 
 Visualisation Functions
