@@ -58,7 +58,8 @@ def setup_ddm_plot(model, ax=None,
         plt.xlim(0, model.max_time)
     else:
         plt.xlim(time_range[0], time_range[1])
-    ax.spines['bottom'].set_visible(False)
+    for side in ['top', 'bottom', 'right']:
+        ax.spines[side].set_visible(False)
     if threshold is None:
         try:
             threshold = model.par_dict['a']
@@ -82,7 +83,8 @@ def setup_race_plot(model, ax=None,
         plt.xlim(0, model.max_time)
     else:
         plt.xlim(time_range[0], time_range[1])
-    ax.spines['bottom'].set_visible(False)
+    for side in ['top', 'bottom', 'right']:
+        ax.spines[side].set_visible(False)
     if threshold is None:
         try:
             threshold = model.par_dict['a']
@@ -325,3 +327,57 @@ def _plot_race_results(X1, X2, responses, rts, n=25,
             m, sd = X.mean(0), X.std(0)
             plt.plot(times, m, color=col)
             plt.fill_between(times, m-sd, m+sd, alpha=.2, color=col)
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Special functions for Schurger Accumulator Model  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+def setup_schurger_figure():
+    fig = plt.figure(constrained_layout=True, figsize=(10, 4))
+    gs0 = fig.add_gridspec(1, 2, width_ratios=[1, 1])
+    gs00 = gs0[0].subgridspec(2, 1)
+    for i in range(2):
+        fig.add_subplot(gs00[i,0])
+    fig.add_subplot(gs0[1])
+    return fig, fig.get_axes()
+
+def visualise_schurger(model, n=100, rp_duration=3):
+    mt = model.max_time
+    dt = model.dt
+    times = np.arange(0, mt, dt)
+    threshold = model.par_dict['a']
+    X, responses, rts = model.do_dataset(n)
+    # Start plotting
+    fig, axes = setup_schurger_figure()
+    # Onset-locked
+    ax0 = setup_race_plot(model, threshold=threshold, ax=axes[0])
+    plt.ylim(-.1, threshold*1.1)
+    plt.sca(axes[0])
+    plot_trace_mean(model, X, ax=ax0)
+    quickplot(X, times=times, n=5)
+    ax0.set_title('Accumulator')
+    # RTs
+    plt.sca(axes[1])
+    plt.hist(rts[~np.isnan(rts)], bins=np.arange(0, mt, .5))
+    plt.xlim(0, mt)
+    plt.xlabel('Time (s)')
+    plt.title('Response times')
+    for side in ['top', 'right']:
+        axes[1].spines[side].set_visible(False)
+    # Response
+    ax2 = setup_race_plot(model, threshold=threshold, time_range=(-rp_duration, 0), ax=axes[2])
+    try:
+        mX = lock_to_movement(X, rts, duration=rp_duration)
+        # mX = (mX.T - mX.iloc[:, 0]).T
+        plot_trace_mean(model, mX, ax=ax2)
+        quickplot(mX, times=mX.columns, n=5)
+    except ValueError:
+        mX = None
+    plt.ylim(-.1, threshold*1.1)
+    ax2.set_title('Response ERP')
+    ax2.set_xlabel('Time to action (s)')
+    ax2.spines['left'].set_visible(False)
+    ax2.spines['right'].set_visible(True)
+    ax2.yaxis.tick_right()
+    return fig, axes

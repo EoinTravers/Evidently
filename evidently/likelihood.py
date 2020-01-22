@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 from scipy import stats
 
-from sklearn.neighbors.kde import KernelDensity
+from sklearn.neighbors import KernelDensity
 
 # Stolen from
 # https://www.statsmodels.org/stable/_modules/statsmodels/nonparametric/bandwidths.html#bw_silverman

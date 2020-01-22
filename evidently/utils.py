@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.neighbors.kde import KernelDensity
+from sklearn.neighbors import KernelDensity
 from numba import jit, njit
 
 def do_dataset_no_stimuli(model, n: int, *args, **kwargs):
@@ -191,3 +191,26 @@ def split_by_accumulator(trace: pd.DataFrame):
     accums = np.unique(accums)
     Xs = [trace.xs(accum, level=1) for accum in accums]
     return Xs
+
+
+def _leaky_accumulation(x0: np.ndarray,
+                        k: float,
+                        V: np.array,
+                        dt=.001):
+    '''Vectorised leaky accumulation.
+
+    Args:
+        x0: Starting values (Shape: n)
+        k: Decay parameter
+        V: Input (including noise) (Shape (nt, n))
+    '''
+    nt = V.shape[0]
+    n = x0.shape[0]
+    x = x0
+    results = np.zeros((n, nt))
+    for i in range(nt):
+        results[:, i] = x
+        x = x + V[i] - .001 * k * x
+    return results.T
+
+leaky_accumulation = jit(_leaky_accumulation, nopython=True)
