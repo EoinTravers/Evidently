@@ -202,12 +202,12 @@ def run_hddm(pars, lower_bound=True, n=50, dt=.001, nt=5000, c=.1):
                                    n=n)
     Z = Z * A # Scale starting point by threshold
     V = clone_column(V, nt).T  # Input as (nt x n) matrix
-    if t0_sd > 0:  # Non-decision times
+    if s_t0 > 0:  # Non-decision times
         for _t0 in T0:
             V[times < (_t0 / dt)] = 0.  # No evidence before t0 on this trial
     else:
-        V[times < (t0_mu / dt)] = 0.
-        # Do accumulation
+        V[times < (m_t0 / dt)] = 0.
+    # Do accumulation
     X = Z + np.cumsum(V * dt + NOISE * np.sqrt(dt), 0)
     if lower_bound:
         rt = np.argmax(np.abs(X) > A, 0)  # Either response boundary

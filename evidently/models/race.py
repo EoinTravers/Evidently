@@ -91,7 +91,7 @@ class Race(BaseModel):
     '''
     def __init__(self,
                  pars = [],
-                 par_names = ['t1', 'v1', 'z1', 't2', 'v2', 'z2', 'a'],
+                 par_names = ['t1', 'v1', 'z1', 'c1', 't2', 'v2', 'z2', 'c2', 'a'],
                  max_time = 5., dt=.001,
                  bounds=None):
         super(Race, self).__init__(trial_func=run_race,
