@@ -191,13 +191,14 @@ def quickplot(X, n=20, times=None):
 ## High-level plots #
 ##  ##  ##  ##  ##  #
 
-def visualise_ddm(model, model_type='ddm',
-                  measure='means',
-                  n=None,
-                  threshold=None):
-    '''Produces a full 3 panel overview of a DDM or HDDM model'''
+def visualise_model(model, model_type='ddm',
+                    measure='means',
+                    n=None,
+                    threshold=None):
+    '''Produces a full 3 panel overview of common models'''
     measures = ['means', 'raw']
-    models = ['ddm', 'wald'] # More to add!
+    models = ['ddm', 'wald', 'race'] # More to add!
+    colors = ['#1f77b4', '#ff7f0e']
     assert(measure in measures), 'measure most be one of %s, not %s' % (repr(measures), measure)
     assert(model_type in models), 'model_type most be one of %s, not %s' % (repr(models), model_type)
     max_t = model.max_time
@@ -209,6 +210,10 @@ def visualise_ddm(model, model_type='ddm',
         resps = [1]
         setup_func = setup_race_plot
         bins = np.arange(0, max_t, .25)
+    elif model_type == 'race':
+        resps = [1, -1]
+        setup_func = setup_race_plot
+        bins = np.arange(-max_t, max_t, .25)
     else:
         raise ValueError()
 
@@ -219,21 +224,26 @@ def visualise_ddm(model, model_type='ddm',
             if v in model.par_dict.keys():
                 threshold = model.par_dict[v]
     X, responses, rts = model.do_dataset(n=n)
-    colors = ['#1f77b4', '#ff7f0e']
     fig, axes = plt.subplots(1, 3, figsize=(16, 3))
     ax0 = setup_func(model, ax=axes[0],
                      threshold=threshold,
                      time_range=(0, max_t))
-    for resp, color in zip([1, -1], colors):
-        mask = responses == resp
-        if mask.sum() > 0:
-            if measure=='means':
-                plot_trace_mean(model, X[mask], ax=ax0, label='Response: %i' % resp)
-            elif measure=='raw':
-                plot_traces(model, X[mask], responses[mask], rts[mask], ax=ax0,
-                            terminate=True, show_mean=True,
-                            threshold=threshold,
-                            color=color, label='Response: %i' % resp)
+
+    if model_type == 'race':
+        X1, X2 = utils.split_by_accumulator(X)
+        _plot_race_results(X2.values, X1.values, responses, rts,
+                           colors=colors, lines=False)
+    else:
+        for resp, color in zip(resps, colors):
+            mask = responses == resp
+            if mask.sum() > 0:
+                if measure=='means':
+                    plot_trace_mean(model, X[mask], ax=ax0, label='Response: %i' % resp)
+                elif measure=='raw':
+                    plot_traces(model, X[mask], responses[mask], rts[mask], ax=ax0,
+                                terminate=True, show_mean=True,
+                                threshold=threshold,
+                                color=color, label='Response: %i' % resp)
     plt.legend(loc='center right')
     plt.title('Stimulus-locked signals')
 
@@ -246,7 +256,11 @@ def visualise_ddm(model, model_type='ddm',
     for resp, color in zip([1, -1], colors):
         mask = responses == resp
         if mask.sum() > 0:
-            resp_mX = lock_to_movement(X[mask], rts[mask], duration=1)
+            if model_type == 'race':
+                rX = {-1: X1, 1: X2}[resp].copy()
+                resp_mX = lock_to_movement(rX[mask], rts[mask], duration=1)
+            else:
+                resp_mX = lock_to_movement(X[mask], rts[mask], duration=1)
             if measure=='means':
                 plot_trace_mean(model, resp_mX, ax=ax2, label='Response: %i' % resp)
             elif measure=='raw':
@@ -292,7 +306,9 @@ def plot_kde(x, *args, **kwargs):
     # t = np.arange(0, 5000, 20)
     # plt.plot(t, kde.evaluate(t))
 
-def _plot_race_results(X1, X2, responses, rts, n=25, lines=True, means=True):
+def _plot_race_results(X1, X2, responses, rts, n=25,
+                       lines=True, means=True,
+                       colors=['b', 'r']):
     times = np.arange(0, 5, .001)
     if lines:
         for i in range(n):
@@ -301,11 +317,11 @@ def _plot_race_results(X1, X2, responses, rts, n=25, lines=True, means=True):
                 rti = -1
             else:
                 rti = int(rt*1000)
-            for col, X in zip(['b', 'r'], [X1, X2]):
+            for col, X in zip(colors, [X1, X2]):
                 plt.plot(times[:rti], X[i,:rti], color=col, alpha=.2)
                 plt.scatter(times[rti], X[i,rti], color=col)
     if means:
-        for col, X in zip(['b', 'r'], [X1, X2]):
+        for col, X in zip(colors, [X1, X2]):
             m, sd = X.mean(0), X.std(0)
             plt.plot(times, m, color=col)
             plt.fill_between(times, m-sd, m+sd, alpha=.2, color=col)

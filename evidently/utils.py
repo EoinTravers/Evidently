@@ -94,6 +94,7 @@ def lock_to_movement(X, rts, duration = 2, min_rt=None):
     float_rts[np.isnan(rts)] = -1
     mask = float_rts > min_rt
     _X = X.loc[mask]
+    _X.columns = _X.columns.astype(float)
     _rts = rts[mask]
     nt = int(duration / dt) + 1
     # This looks worse than it is
