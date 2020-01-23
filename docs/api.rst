@@ -40,10 +40,10 @@ Simple Race Model
       :undoc-members:
       :show-inheritance:
 
-Heirarchical Models
+Hierarchical Models
 -------------------
 
-Heirarchical Diffusion
+Hierarchical Diffusion
 ^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: evidently.HDiffusion
