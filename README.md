@@ -17,6 +17,12 @@ click the link below to launch a notebook packed full of interactive visualisati
 
 [![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/EoinTravers/Evidently/master?filepath=notebooks%2FInteractive%20Models.ipynb)
 
+## Installation
+
+Evidently isn't on PyPI yet, but you can install it directly from GitHub:
+
+`pip install git+https://github.com/EoinTravers/Evidently`
+
 ## Basic Use
 
 
@@ -445,5 +451,3 @@ based on the "likelihood-free" technique introduced by
 [Turner and Sederberg (2007)](https://link.springer.com/article/10.3758/s13423-013-0530-0).
 These functions aren't properly tested yet,
 and haven't been documented.
-
-

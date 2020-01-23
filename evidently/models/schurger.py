@@ -7,8 +7,9 @@ from ..base import BaseModel
 def run_schurger(pars, n=50, dt=.001, nt=12000, a=1.):
     '''Single-accumulator model with leak, used as a model for self-initiated actions.
 
-    Note that this implementation has t0 and z parameters that do no feature in the original version.
-    These should be set to 0 to recover the original implementation.
+    Note that this implementation has t0 and z parameters that do not
+    feature in the original version. These should be set to 0 to
+    recover the original implementation.
 
     Args:
         pars: Model parameters
@@ -26,6 +27,7 @@ def run_schurger(pars, n=50, dt=.001, nt=12000, a=1.):
         X: State of accumulator over time (np.array:  n x nt)
         response: 1 if threshold crossed, 0 otherwise.
         rt: Time of threshold crossing, in seconds, or np.NaN
+
     '''
     t0, v, k, z, a, c = pars
     times = np.arange(nt)

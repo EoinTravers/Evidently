@@ -269,7 +269,7 @@ class HDiffusion(BaseModel):
     | a ~ Gamma*(m_a, s_a);
 
     Gamma*(m, s) denotes random samples from a Gamma distribution with
-    mean s and standard deviation s. See
+    mean m and standard deviation s. See
     `evidently.utils.random_gamma` for details. We use the Gamma
     distribution for parameters that must be positive.
 
