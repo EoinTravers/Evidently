@@ -2,32 +2,63 @@
 Models
 ======
 
-.. autoclass:: accumulate.BaseModel
+
+BaseModel
+---------
+
+The `BaseModel` class is the basis for every other model.
+
+.. autoclass:: evidently.BaseModel
       :members:
       :undoc-members:
       :show-inheritance:
 
-.. autoclass:: accumulate.Diffusion
+Classic Models
+--------------
+
+Drift Diffusion
+^^^^^^^^^^^^^^^
+
+.. autoclass:: evidently.Diffusion
       :members:
       :undoc-members:
       :show-inheritance:
 
-.. autoclass:: accumulate.Wald
+Wald (One-boundary) Diffusion
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: evidently.Wald
       :members:
       :undoc-members:
       :show-inheritance:
 
-.. autoclass:: accumulate.Race
+Simple Race Model
+^^^^^^^^^^^^^^^^^
+
+.. autoclass:: evidently.Race
       :members:
       :undoc-members:
       :show-inheritance:
 
-.. autoclass:: accumulate.HDiffusion
+Heirarchical Models
+-------------------
+
+Heirarchical Diffusion
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: evidently.HDiffusion
       :members:
       :undoc-members:
       :show-inheritance:
 
-.. autoclass:: accumulate.HWald
+.. autoclass:: evidently.HWald
+      :members:
+      :undoc-members:
+      :show-inheritance:
+
+Others
+------
+.. autoclass:: evidently.models.Schurger
       :members:
       :undoc-members:
       :show-inheritance:
@@ -39,7 +70,7 @@ Visualisation Functions
 
 Warning: This documentation is patchy and incomplete.
 
-.. automodule:: accumulate.viz
+.. automodule:: evidently.viz
       :members:
       :undoc-members:
       :show-inheritance:
@@ -49,7 +80,7 @@ Utility Functions
 
 Warning: This documentation is patchy and incomplete.
 
-.. automodule:: accumulate.utils
+.. automodule:: evidently.utils
       :members:
       :undoc-members:
       :show-inheritance:

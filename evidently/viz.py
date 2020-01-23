@@ -58,7 +58,8 @@ def setup_ddm_plot(model, ax=None,
         plt.xlim(0, model.max_time)
     else:
         plt.xlim(time_range[0], time_range[1])
-    ax.spines['bottom'].set_visible(False)
+    for side in ['top', 'bottom', 'right']:
+        ax.spines[side].set_visible(False)
     if threshold is None:
         try:
             threshold = model.par_dict['a']
@@ -82,7 +83,8 @@ def setup_race_plot(model, ax=None,
         plt.xlim(0, model.max_time)
     else:
         plt.xlim(time_range[0], time_range[1])
-    ax.spines['bottom'].set_visible(False)
+    for side in ['top', 'bottom', 'right']:
+        ax.spines[side].set_visible(False)
     if threshold is None:
         try:
             threshold = model.par_dict['a']
@@ -191,13 +193,14 @@ def quickplot(X, n=20, times=None):
 ## High-level plots #
 ##  ##  ##  ##  ##  #
 
-def visualise_ddm(model, model_type='ddm',
-                  measure='means',
-                  n=None,
-                  threshold=None):
-    '''Produces a full 3 panel overview of a DDM or HDDM model'''
+def visualise_model(model, model_type='ddm',
+                    measure='means',
+                    n=None,
+                    threshold=None):
+    '''Produces a full 3 panel overview of common models'''
     measures = ['means', 'raw']
-    models = ['ddm', 'wald'] # More to add!
+    models = ['ddm', 'wald', 'race'] # More to add!
+    colors = ['#1f77b4', '#ff7f0e']
     assert(measure in measures), 'measure most be one of %s, not %s' % (repr(measures), measure)
     assert(model_type in models), 'model_type most be one of %s, not %s' % (repr(models), model_type)
     max_t = model.max_time
@@ -209,6 +212,10 @@ def visualise_ddm(model, model_type='ddm',
         resps = [1]
         setup_func = setup_race_plot
         bins = np.arange(0, max_t, .25)
+    elif model_type == 'race':
+        resps = [1, -1]
+        setup_func = setup_race_plot
+        bins = np.arange(-max_t, max_t, .25)
     else:
         raise ValueError()
 
@@ -219,21 +226,26 @@ def visualise_ddm(model, model_type='ddm',
             if v in model.par_dict.keys():
                 threshold = model.par_dict[v]
     X, responses, rts = model.do_dataset(n=n)
-    colors = ['#1f77b4', '#ff7f0e']
     fig, axes = plt.subplots(1, 3, figsize=(16, 3))
     ax0 = setup_func(model, ax=axes[0],
                      threshold=threshold,
                      time_range=(0, max_t))
-    for resp, color in zip([1, -1], colors):
-        mask = responses == resp
-        if mask.sum() > 0:
-            if measure=='means':
-                plot_trace_mean(model, X[mask], ax=ax0, label='Response: %i' % resp)
-            elif measure=='raw':
-                plot_traces(model, X[mask], responses[mask], rts[mask], ax=ax0,
-                            terminate=True, show_mean=True,
-                            threshold=threshold,
-                            color=color, label='Response: %i' % resp)
+
+    if model_type == 'race':
+        X1, X2 = utils.split_by_accumulator(X)
+        _plot_race_results(X2.values, X1.values, responses, rts,
+                           colors=colors, lines=False)
+    else:
+        for resp, color in zip(resps, colors):
+            mask = responses == resp
+            if mask.sum() > 0:
+                if measure=='means':
+                    plot_trace_mean(model, X[mask], ax=ax0, label='Response: %i' % resp)
+                elif measure=='raw':
+                    plot_traces(model, X[mask], responses[mask], rts[mask], ax=ax0,
+                                terminate=True, show_mean=True,
+                                threshold=threshold,
+                                color=color, label='Response: %i' % resp)
     plt.legend(loc='center right')
     plt.title('Stimulus-locked signals')
 
@@ -246,7 +258,11 @@ def visualise_ddm(model, model_type='ddm',
     for resp, color in zip([1, -1], colors):
         mask = responses == resp
         if mask.sum() > 0:
-            resp_mX = lock_to_movement(X[mask], rts[mask], duration=1)
+            if model_type == 'race':
+                rX = {-1: X1, 1: X2}[resp].copy()
+                resp_mX = lock_to_movement(rX[mask], rts[mask], duration=1)
+            else:
+                resp_mX = lock_to_movement(X[mask], rts[mask], duration=1)
             if measure=='means':
                 plot_trace_mean(model, resp_mX, ax=ax2, label='Response: %i' % resp)
             elif measure=='raw':
@@ -292,7 +308,9 @@ def plot_kde(x, *args, **kwargs):
     # t = np.arange(0, 5000, 20)
     # plt.plot(t, kde.evaluate(t))
 
-def _plot_race_results(X1, X2, responses, rts, n=25, lines=True, means=True):
+def _plot_race_results(X1, X2, responses, rts, n=25,
+                       lines=True, means=True,
+                       colors=['b', 'r']):
     times = np.arange(0, 5, .001)
     if lines:
         for i in range(n):
@@ -301,11 +319,65 @@ def _plot_race_results(X1, X2, responses, rts, n=25, lines=True, means=True):
                 rti = -1
             else:
                 rti = int(rt*1000)
-            for col, X in zip(['b', 'r'], [X1, X2]):
+            for col, X in zip(colors, [X1, X2]):
                 plt.plot(times[:rti], X[i,:rti], color=col, alpha=.2)
                 plt.scatter(times[rti], X[i,rti], color=col)
     if means:
-        for col, X in zip(['b', 'r'], [X1, X2]):
+        for col, X in zip(colors, [X1, X2]):
             m, sd = X.mean(0), X.std(0)
             plt.plot(times, m, color=col)
             plt.fill_between(times, m-sd, m+sd, alpha=.2, color=col)
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Special functions for Schurger Accumulator Model  #
+# # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+def setup_schurger_figure():
+    fig = plt.figure(constrained_layout=True, figsize=(10, 4))
+    gs0 = fig.add_gridspec(1, 2, width_ratios=[1, 1])
+    gs00 = gs0[0].subgridspec(2, 1)
+    for i in range(2):
+        fig.add_subplot(gs00[i,0])
+    fig.add_subplot(gs0[1])
+    return fig, fig.get_axes()
+
+def visualise_schurger(model, n=100, rp_duration=3):
+    mt = model.max_time
+    dt = model.dt
+    times = np.arange(0, mt, dt)
+    threshold = model.par_dict['a']
+    X, responses, rts = model.do_dataset(n)
+    # Start plotting
+    fig, axes = setup_schurger_figure()
+    # Onset-locked
+    ax0 = setup_race_plot(model, threshold=threshold, ax=axes[0])
+    plt.ylim(-.1, threshold*1.1)
+    plt.sca(axes[0])
+    plot_trace_mean(model, X, ax=ax0)
+    quickplot(X, times=times, n=5)
+    ax0.set_title('Accumulator')
+    # RTs
+    plt.sca(axes[1])
+    plt.hist(rts[~np.isnan(rts)], bins=np.arange(0, mt, .5))
+    plt.xlim(0, mt)
+    plt.xlabel('Time (s)')
+    plt.title('Response times')
+    for side in ['top', 'right']:
+        axes[1].spines[side].set_visible(False)
+    # Response
+    ax2 = setup_race_plot(model, threshold=threshold, time_range=(-rp_duration, 0), ax=axes[2])
+    try:
+        mX = lock_to_movement(X, rts, duration=rp_duration)
+        # mX = (mX.T - mX.iloc[:, 0]).T
+        plot_trace_mean(model, mX, ax=ax2)
+        quickplot(mX, times=mX.columns, n=5)
+    except ValueError:
+        mX = None
+    plt.ylim(-.1, threshold*1.1)
+    ax2.set_title('Response ERP')
+    ax2.set_xlabel('Time to action (s)')
+    ax2.spines['left'].set_visible(False)
+    ax2.spines['right'].set_visible(True)
+    ax2.yaxis.tick_right()
+    return fig, axes

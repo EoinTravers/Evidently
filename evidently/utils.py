@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.neighbors.kde import KernelDensity
+from sklearn.neighbors import KernelDensity
 from numba import jit, njit
 
 def do_dataset_no_stimuli(model, n: int, *args, **kwargs):
@@ -94,6 +94,7 @@ def lock_to_movement(X, rts, duration = 2, min_rt=None):
     float_rts[np.isnan(rts)] = -1
     mask = float_rts > min_rt
     _X = X.loc[mask]
+    _X.columns = _X.columns.astype(float)
     _rts = rts[mask]
     nt = int(duration / dt) + 1
     # This looks worse than it is
@@ -129,10 +130,7 @@ def random_gamma(mean: float, sd: float, n=None):
     shape = mean**2 / var
     scale = var / mean
     x = np.random.gamma(shape, scale, n)
-    if len(x) == 1:
-        return x[0]
-    else:
-        return x
+    return x
 
 def random_normal(mean: float, sd: float, n=None):
     '''np.random.normal(loc=mean, scale=sd, size=n)'''
@@ -193,3 +191,26 @@ def split_by_accumulator(trace: pd.DataFrame):
     accums = np.unique(accums)
     Xs = [trace.xs(accum, level=1) for accum in accums]
     return Xs
+
+
+def _leaky_accumulation(x0: np.ndarray,
+                        k: float,
+                        V: np.array,
+                        dt=.001):
+    '''Vectorised leaky accumulation.
+
+    Args:
+        x0: Starting values (Shape: n)
+        k: Decay parameter
+        V: Input (including noise) (Shape (nt, n))
+    '''
+    nt = V.shape[0]
+    n = x0.shape[0]
+    x = x0
+    results = np.zeros((n, nt))
+    for i in range(nt):
+        results[:, i] = x
+        x = x + V[i] - .001 * k * x
+    return results.T
+
+leaky_accumulation = jit(_leaky_accumulation, nopython=True)

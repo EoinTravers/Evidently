@@ -1,6 +1,6 @@
 
 .. Get introductory stuff from github README
-.. mdinclude:: ../README.md
+.. mdinclude:: README.md
 
 
 API
