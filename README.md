@@ -436,3 +436,9 @@ based on the "likelihood-free" technique introduced by
 [Turner and Sederberg (2007)](https://link.springer.com/article/10.3758/s13423-013-0530-0).
 These functions aren't properly tested yet,
 and haven't been documented.
+
+
+# Support
+
+Development of Evidently was in part supported by  a research
+project grant from The Leverhulme Trust (RPG-2016-378)
