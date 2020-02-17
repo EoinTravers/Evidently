@@ -199,7 +199,7 @@ def visualise_model(model, model_type='ddm',
                     threshold=None):
     '''Produces a full 3 panel overview of common models'''
     measures = ['means', 'raw']
-    models = ['ddm', 'wald', 'race'] # More to add!
+    models = ['ddm', 'wald', 'race']  # More to add!
     colors = ['#1f77b4', '#ff7f0e']
     assert(measure in measures), 'measure most be one of %s, not %s' % (repr(measures), measure)
     assert(model_type in models), 'model_type most be one of %s, not %s' % (repr(models), model_type)
@@ -234,14 +234,16 @@ def visualise_model(model, model_type='ddm',
     if model_type == 'race':
         X1, X2 = utils.split_by_accumulator(X)
         _plot_race_results(X2.values, X1.values, responses, rts,
-                           colors=colors, lines=False)
+                           lines=measure == 'raw',
+                           means=measure == 'means',
+                           colors=colors)
     else:
         for resp, color in zip(resps, colors):
             mask = responses == resp
             if mask.sum() > 0:
-                if measure=='means':
+                if measure == 'means':
                     plot_trace_mean(model, X[mask], ax=ax0, label='Response: %i' % resp)
-                elif measure=='raw':
+                elif measure == 'raw':
                     plot_traces(model, X[mask], responses[mask], rts[mask], ax=ax0,
                                 terminate=True, show_mean=True,
                                 threshold=threshold,
@@ -251,7 +253,7 @@ def visualise_model(model, model_type='ddm',
 
     plt.sca(axes[1])
     for r in resps:
-        plt.hist(r * rts[responses==r] , bins=bins)
+        plt.hist(r * rts[responses == r] , bins=bins)
     plt.title('Response Times')
 
     ax2 = setup_func(model, ax=axes[2], time_range=(-1, 0), threshold=threshold)
@@ -327,6 +329,14 @@ def _plot_race_results(X1, X2, responses, rts, n=25,
             m, sd = X.mean(0), X.std(0)
             plt.plot(times, m, color=col)
             plt.fill_between(times, m-sd, m+sd, alpha=.2, color=col)
+    # else:
+    #     for col, X in zip(colors, [X1, X2]):
+    #         for i in range(n):
+    #         m, sd = X.mean(0), X.std(0)
+    #         plt.plot(times, m, color=col)
+    #         plt.fill_between(times, m-sd, m+sd, alpha=.2, color=col)
+
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # #

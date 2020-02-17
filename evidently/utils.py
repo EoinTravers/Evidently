@@ -184,6 +184,12 @@ def clone_column(x: np.array, n: int):
     '''[a,b,c] -> [[a,b,c], [a,b,c], ..., [a,b,c]]'''
     return np.array([list(x), ]  * n).T
 
+@jit()
+def fill_matrix(dim: int, diagonal: float, off_diagonal: float) -> np.ndarray:
+    matrix_I = np.identity(dim)
+    return (matrix_I * -(off_diagonal - diagonal)) + off_diagonal
+
+
 def split_by_accumulator(trace: pd.DataFrame):
     if trace.index.names[1] != 'accumulator':
         raise Exception('Model does not have multiple accumulators')
@@ -214,3 +220,48 @@ def _leaky_accumulation(x0: np.ndarray,
     return results.T
 
 leaky_accumulation = jit(_leaky_accumulation, nopython=True)
+
+
+def _leaky_competition(x0: np.ndarray,
+                       k: float,
+                       b: float,
+                       V: np.array,
+                       n_trials: int,
+                       n_accums: int,
+                       n_times: int,
+                       rectify=True,
+                       dt=.001):
+    '''Simulate multiple trials of leaky competition between multiple accumulators.
+    See equation 4 of Usher & McClelland (2011)
+    http://web.stanford.edu/~jlmcc/papers/UsherMcC01.pdf
+
+    Args:
+        x0: Starting values (Shape: n_trials, n_accums)
+        k: Self-feedback (negative for decay)
+        b: Lateral feedback (negative for lateral inhibition)
+        V: Input (including noise), (Shape (n_trials, n_accums, n_times))
+           Should already be scaled appropriately, eq N(v * dt, c * np.sqrt(dt))
+        rectify: Prevent negative values?
+        dt: Time step
+
+    Returns:
+        np.ndarray of accumualtor values (nt, n)
+    '''
+    assert(V.shape == (n_trials, n_accums, n_times))
+    assert(x0.shape == (n_trials, n_accums))
+    # Can we do this without a loop?
+    transition_matrix = fill_matrix(n_accums, diagonal=k, off_diagonal=b)
+    results = np.zeros_like(V)
+    for trial_ix in range(n_trials):
+        accum_res = np.zeros((n_accums, n_times))
+        x = x0[trial_ix]
+        for i in range(n_times):
+            accum_res[:, i] = x
+            dx = V[trial_ix, :, i] + x.dot(transition_matrix) * dt
+            x = x + dx
+            if rectify:
+                x[x < 0] = 0.
+        results[trial_ix, :, :] = accum_res
+    return results
+
+leaky_competition = jit(_leaky_competition, nopython=True)

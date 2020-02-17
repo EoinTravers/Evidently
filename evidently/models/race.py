@@ -46,12 +46,16 @@ def run_race(pars, n=50, dt=.001, nt=5000):
         Xs.append(X.T)
         crossing_times.append(crossing_time)
     # Figure out crossing times, responses, and rts.
+    max_rt = nt + 1
     crossing_times = np.array(crossing_times)
+    crossing_times[crossing_times == 0] = max_rt
     which_first = np.argmin(crossing_times, 0)
     responses = np.where(which_first == 1, 1, -1)
-    rts = np.min(crossing_times, 0) * dt
-    responses[rts == 0] = 0
-    rts[rts == 0] = np.nan
+    rts = np.min(crossing_times, 0).astype(float)
+    timeouts = rts == max_rt
+    rts *= dt
+    responses[timeouts] = 0
+    rts[timeouts] = np.nan
     return Xs, responses, rts
 
 
@@ -101,9 +105,11 @@ class Race(BaseModel):
                                        't1': 'Non-decision time for accumulator 1',
                                        'v1': 'Drift rate for accumulator 1',
                                        'z1': 'Starting point for accumulator 1',
+                                       'c1': 'Noise for accumulator x1',
                                        't2': 'Non-decision time for accumulator 2',
                                        'v2': 'Drift rate for accumulator 2',
                                        'z2': 'Starting point for accumulator 2',
+                                       'c2': 'Noise for accumulator x2',
                                        'a' : 'Threshold'
                                    },
                                    max_time = max_time, dt=dt,
