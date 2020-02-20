@@ -1,5 +1,5 @@
 import numpy as np
-from ..utils import clone_column, generate_randoms, fill_matrix, leaky_competition
+from ..utils import leaky_competition, weibull_bounds
 from ..base import BaseModel
 
 
@@ -46,9 +46,11 @@ def run_lca(pars, n=50, dt=.001, nt=5000):
         INPUTS[:, i] *= v
         NOISE[:, i] *= c
     INPUTS = dt * INPUTS + np.sqrt(dt) * NOISE
+    # Simulate accumulation for multiple trials
     X_matrix = leaky_competition(x0, k, b, INPUTS,
                                  n_trials=n, n_accums=2, n_times=nt,
-                                 rectify=True, dt=dt)
+                                 saturation = None, rectify=True, dt=dt)
+    # Get responses, response times, and output traces.
     Xs, crossing_times = [], []
     for i in range(2):
         iX = X_matrix[:, i]
@@ -56,7 +58,7 @@ def run_lca(pars, n=50, dt=.001, nt=5000):
         Xs.append(iX)
         crossing_times.append(crossing_time)
     crossing_times = np.array(crossing_times)
-    max_rt = nt + 1
+    max_rt = nt + 1  # To avoid classing 0 as a very fast response.
     crossing_times[crossing_times == 0] = max_rt
     which_first = np.argmin(crossing_times, 0)
     responses = np.where(which_first == 1, 1, -1)
@@ -131,3 +133,79 @@ class LCA(BaseModel):
                                   bounds=None,
                                   n_traces=2)
         self.name = 'Leaky Competing Accumulator'
+
+
+def run_lca_collapsing(pars, n=50, dt=.001, nt=5000):
+    '''Run multiple vectorised LCA models with two accumulators
+    and Weibull collapsing boundaries.
+
+    In this generic version, we allow t0, v, k and z to differ between accumulators.
+    In practice, you'll probably want to fix some of these parameters.
+
+    Args:
+        pars: Model parameters
+
+          - t1: Onset of evidence accumulation (seconds) for x1
+          - v1: Drift rate for x1
+          - z1: Starting point for x1
+          - c1: Noise for x1
+          - t2: Onset of evidence accumulation (seconds) for x2
+          - v2: Drift rate for x2
+          - z2: Starting point for x2
+          - c2: Noise for x2
+          - k: Autofeedback (negative for decay)
+          - b: Lateral feedback (negative for inhibition)
+          - a: Initial threshold
+          - a_terminal: Final threshold
+          - a_time:  Time of threshold collapse
+          - a_shape: Shape of threshold collapse
+
+        n: Number of trials to simulate
+        dt: Delta time
+        nt: Number of time steps. Trial duration = nt/dt
+
+    Returns:
+        (list, array, array): tuple containing:
+
+            - [X1, X2]: (List of 2 n x nt np.ndarrays): State of accumulators over time [list of (np.array:  n x nt)]
+            - responses (np.ndarray): +/-1 if upper/lower threshold crossed, 0 otherwise.
+            - rts (np.ndarray): Time of threshold crossing, in seconds, or np.NaN
+    '''
+    t1, v1, z1, c1, t2, v2, z2, c2, k, b, a, a_terminal, a_time, a_shape = pars
+    times = np.arange(nt)
+    x0 = np.repeat([z1, z2], n).reshape(2, n).T
+    INPUTS = np.ones((n, 2, nt))
+    NOISE = np.random.normal(0., 1., (n, 2, nt))
+    for i, t, v, c in zip([0, 1], [t1, t2], [v1, v2], [c1, c2]):
+        INPUTS[:, i, times < t] = 0
+        INPUTS[:, i] *= v
+        NOISE[:, i] *= c
+    INPUTS = dt * INPUTS + np.sqrt(dt) * NOISE
+    # Simulate accumulation for multiple trials
+    THRESHOLD = weibull_bounds(times, a, a_terminal, a_time, a_shape)
+    X_matrix = leaky_competition(x0, k, b, INPUTS,
+                                 n_trials=n, n_accums=2, n_times=nt,
+                                 saturation = None, rectify=True, dt=dt)
+    # Get responses, response times, and output traces.
+    Xs, crossing_times = [], []
+    for i in range(2):
+        iX = X_matrix[:, i]
+        crossing_time = np.argmax(iX > THRESHOLD, 1)
+        Xs.append(iX)
+        crossing_times.append(crossing_time)
+    crossing_times = np.array(crossing_times)
+    max_rt = nt + 1  # To avoid classing 0 as a very fast response.
+    crossing_times[crossing_times == 0] = max_rt
+    which_first = np.argmin(crossing_times, 0)
+    responses = np.where(which_first == 1, 1, -1)
+    rts = np.min(crossing_times, 0).astype(float)
+    timeouts = rts == max_rt
+    rts *= dt
+    responses[timeouts] = 0
+    rts[timeouts] = np.nan
+    return Xs, responses, rts
+
+
+class LCACollapsing(BaseModel):
+    def __init__(self, *args, **kwargs):
+        raise NotImplementedError

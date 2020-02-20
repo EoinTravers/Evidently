@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.neighbors import KernelDensity
 from numba import jit, njit
+from typing import Union, Optional
 
 def do_dataset_no_stimuli(model, n: int, *args, **kwargs):
     '''Simulate a dataset for a model that does not take trial-by-trial inputs.
@@ -229,8 +230,9 @@ def _leaky_competition(x0: np.ndarray,
                        n_trials: int,
                        n_accums: int,
                        n_times: int,
-                       rectify=True,
-                       dt=.001):
+                       saturation: Optional[float] = None,
+                       rectify: bool               = True,
+                       dt: float                   = .001):
     '''Simulate multiple trials of leaky competition between multiple accumulators.
     See equation 4 of Usher & McClelland (2011)
     http://web.stanford.edu/~jlmcc/papers/UsherMcC01.pdf
@@ -241,6 +243,8 @@ def _leaky_competition(x0: np.ndarray,
         b: Lateral feedback (negative for lateral inhibition)
         V: Input (including noise), (Shape (n_trials, n_accums, n_times))
            Should already be scaled appropriately, eq N(v * dt, c * np.sqrt(dt))
+        saturation: Prevent values higher than a threshold? Should be None, or a threshold.
+                    Should be slightly higher than response threshold!
         rectify: Prevent negative values?
         dt: Time step
 
@@ -261,7 +265,25 @@ def _leaky_competition(x0: np.ndarray,
             x = x + dx
             if rectify:
                 x[x < 0] = 0.
+            if saturation is not None:
+                x[x > saturation] = saturation
         results[trial_ix, :, :] = accum_res
     return results
 
 leaky_competition = jit(_leaky_competition, nopython=True)
+
+def weibull_bounds(times, a_initial: float, a_terminal: float, time_par: float, shape_par: float):
+    '''Weibull collapsing bounds function.
+    Args:
+        times: Time points to calculate the bounds at
+        a_initial: Starting height of bounds
+        a_terminal: Final height of bounds.
+                    May not be reached by the end of the time window
+        time_par: Dictates how late the bounds begin to collapse.
+        shape_par: Dictates how steeply the bounds collapse
+
+    See https://pyddm.readthedocs.io/en/latest/cookbook/bounds.html#bound-weibull-cdf,
+    and https://www.jneurosci.org/content/35/6/2476
+
+    '''
+    return a_initial - (1 - np.exp(-(times / time_par)**shape_par)) * (a_initial - a_terminal)
