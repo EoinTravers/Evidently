@@ -1,4 +1,3 @@
-
 # Evidently: Simulate Evidence Accumulation Models in Python
 
 `Evidently` is a python package for working with evidence accumulation models.
@@ -12,8 +11,17 @@ It provides
 - Kernel density-based methods for estimating 
   the likelihood of real data under a given model/set of parameters,
   allowing parameter estimation and model comparision.
-  
 
+To see some of the features of Evidently in action,
+click the link below to launch a notebook packed full of interactive visualisations.
+
+[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/EoinTravers/Evidently/master?filepath=dashboards%2FInteractive%20Models.ipynb)
+
+## Installation
+
+Evidently isn't on PyPI yet, but you can install it directly from GitHub:
+
+`pip install git+https://github.com/EoinTravers/Evidently`
 
 ## Basic Use
 
@@ -67,22 +75,7 @@ X.head()
 ```
 
 
-
-
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -137,123 +130,123 @@ X.head()
   <tbody>
     <tr>
       <th>0</th>
-      <td>-0.177320</td>
-      <td>-0.172509</td>
-      <td>-0.180896</td>
-      <td>-0.170542</td>
-      <td>-0.180081</td>
-      <td>-0.185857</td>
-      <td>-0.219079</td>
-      <td>-0.216570</td>
-      <td>-0.243592</td>
-      <td>-0.228941</td>
+      <td>-0.207292</td>
+      <td>-0.195330</td>
+      <td>-0.189456</td>
+      <td>-0.207362</td>
+      <td>-0.203131</td>
+      <td>-0.209652</td>
+      <td>-0.201883</td>
+      <td>-0.216559</td>
+      <td>-0.224473</td>
+      <td>-0.211417</td>
       <td>...</td>
-      <td>0.806232</td>
-      <td>0.788164</td>
-      <td>0.806839</td>
-      <td>0.803457</td>
-      <td>0.801539</td>
-      <td>0.809231</td>
-      <td>0.801905</td>
-      <td>0.790250</td>
-      <td>0.760990</td>
-      <td>0.754869</td>
+      <td>2.886206</td>
+      <td>2.886012</td>
+      <td>2.871632</td>
+      <td>2.870360</td>
+      <td>2.846827</td>
+      <td>2.854295</td>
+      <td>2.854028</td>
+      <td>2.899442</td>
+      <td>2.906381</td>
+      <td>2.917107</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>-0.186142</td>
-      <td>-0.184029</td>
-      <td>-0.180858</td>
-      <td>-0.154955</td>
-      <td>-0.162967</td>
-      <td>-0.181358</td>
-      <td>-0.175131</td>
-      <td>-0.182371</td>
-      <td>-0.188530</td>
-      <td>-0.177745</td>
+      <td>-0.201057</td>
+      <td>-0.194829</td>
+      <td>-0.190369</td>
+      <td>-0.204401</td>
+      <td>-0.211715</td>
+      <td>-0.223547</td>
+      <td>-0.223436</td>
+      <td>-0.229830</td>
+      <td>-0.228947</td>
+      <td>-0.200351</td>
       <td>...</td>
-      <td>0.669138</td>
-      <td>0.666357</td>
-      <td>0.685992</td>
-      <td>0.684661</td>
-      <td>0.698854</td>
-      <td>0.697201</td>
-      <td>0.710906</td>
-      <td>0.701409</td>
-      <td>0.683404</td>
-      <td>0.698551</td>
+      <td>0.563363</td>
+      <td>0.546944</td>
+      <td>0.535339</td>
+      <td>0.526217</td>
+      <td>0.523513</td>
+      <td>0.525713</td>
+      <td>0.529461</td>
+      <td>0.544851</td>
+      <td>0.539877</td>
+      <td>0.538094</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>-0.200028</td>
-      <td>-0.192888</td>
-      <td>-0.181851</td>
-      <td>-0.177324</td>
-      <td>-0.166068</td>
-      <td>-0.160294</td>
-      <td>-0.155698</td>
-      <td>-0.155691</td>
-      <td>-0.150309</td>
-      <td>-0.150653</td>
+      <td>-0.199180</td>
+      <td>-0.192633</td>
+      <td>-0.185509</td>
+      <td>-0.168731</td>
+      <td>-0.174054</td>
+      <td>-0.173817</td>
+      <td>-0.182057</td>
+      <td>-0.181962</td>
+      <td>-0.192889</td>
+      <td>-0.157841</td>
       <td>...</td>
-      <td>1.964930</td>
-      <td>1.961359</td>
-      <td>1.947321</td>
-      <td>1.940496</td>
-      <td>1.927814</td>
-      <td>1.932019</td>
-      <td>1.947697</td>
-      <td>1.950462</td>
-      <td>1.963250</td>
-      <td>1.968946</td>
+      <td>2.501043</td>
+      <td>2.500121</td>
+      <td>2.487202</td>
+      <td>2.492311</td>
+      <td>2.480312</td>
+      <td>2.482806</td>
+      <td>2.489521</td>
+      <td>2.481254</td>
+      <td>2.479215</td>
+      <td>2.464364</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>-0.201833</td>
-      <td>-0.202006</td>
-      <td>-0.196713</td>
-      <td>-0.189972</td>
-      <td>-0.197487</td>
-      <td>-0.203684</td>
-      <td>-0.200066</td>
-      <td>-0.185335</td>
-      <td>-0.204493</td>
-      <td>-0.203075</td>
+      <td>-0.207049</td>
+      <td>-0.230524</td>
+      <td>-0.223886</td>
+      <td>-0.228257</td>
+      <td>-0.221087</td>
+      <td>-0.224099</td>
+      <td>-0.236907</td>
+      <td>-0.238688</td>
+      <td>-0.231143</td>
+      <td>-0.248498</td>
       <td>...</td>
-      <td>3.281451</td>
-      <td>3.284107</td>
-      <td>3.300431</td>
-      <td>3.316514</td>
-      <td>3.328128</td>
-      <td>3.343874</td>
-      <td>3.347172</td>
-      <td>3.348986</td>
-      <td>3.348839</td>
-      <td>3.352577</td>
+      <td>2.188082</td>
+      <td>2.181968</td>
+      <td>2.201805</td>
+      <td>2.205892</td>
+      <td>2.204378</td>
+      <td>2.222228</td>
+      <td>2.250239</td>
+      <td>2.251298</td>
+      <td>2.273741</td>
+      <td>2.270209</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>-0.190844</td>
-      <td>-0.169060</td>
-      <td>-0.169779</td>
-      <td>-0.176012</td>
-      <td>-0.175741</td>
-      <td>-0.198513</td>
-      <td>-0.201160</td>
-      <td>-0.201007</td>
-      <td>-0.193516</td>
-      <td>-0.197130</td>
+      <td>-0.218699</td>
+      <td>-0.202019</td>
+      <td>-0.205839</td>
+      <td>-0.192008</td>
+      <td>-0.179896</td>
+      <td>-0.181002</td>
+      <td>-0.198876</td>
+      <td>-0.190790</td>
+      <td>-0.175592</td>
+      <td>-0.190891</td>
       <td>...</td>
-      <td>1.668648</td>
-      <td>1.663570</td>
-      <td>1.643179</td>
-      <td>1.639827</td>
-      <td>1.658923</td>
-      <td>1.669544</td>
-      <td>1.676298</td>
-      <td>1.679252</td>
-      <td>1.677764</td>
-      <td>1.659028</td>
+      <td>3.363507</td>
+      <td>3.372508</td>
+      <td>3.387018</td>
+      <td>3.409127</td>
+      <td>3.388889</td>
+      <td>3.363482</td>
+      <td>3.363401</td>
+      <td>3.364192</td>
+      <td>3.370832</td>
+      <td>3.392171</td>
     </tr>
   </tbody>
 </table>
@@ -268,8 +261,8 @@ print(responses[:5])
 print(rts[:5])
 ```
 
-    [ 1. -1.  1.  1.  1.]
-    [3.445 0.553 1.811 1.888 3.087]
+    [1. 1. 1. 1. 1.]
+    [1.622 3.958 1.902 3.537 1.974]
 
 
 ## Visualise
@@ -355,11 +348,9 @@ evidently.viz.visualise_model(model, model_type='ddm', measure='means');
 Using the `ipywidgets` package, we can wrap high level visualisation functions like `accum.viz.visualise_ddm` in a call to `ipywidgets` to make them interactive.
 
 To try the interactive plots, download this repository to your own computer,
-or run the code in the cloud by visiting [this Binder notebook]().
+or run the code in the cloud by visiting [this Binder notebook](https://mybinder.org/v2/gh/EoinTravers/Evidently/master?filepath=dashboards%2FInteractive%20Models.ipynb).
 
-
-<!-- This will work once we run gen_readme.sh -->
-![](imgs/interactive.gif)
+[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/EoinTravers/Evidently/master?filepath=dashboards%2FInteractive%20Models.ipynb)
 
 
 ```python
@@ -382,8 +373,11 @@ interact(ddm_simulation_plot,
 ```
 
 
-![png](imgs/README_21_0.png)
+![png](imgs/README_20_0.png)
 
+
+<!-- This will work once we run gen_readme.sh -->
+![](imgs/interactive.gif)
 
 # Other Models
 
@@ -410,7 +404,7 @@ I have already implemented several of these models, but have to integrate them w
 - Time-varying parameters, including
     - Collapsing decision bounds
     - Time-varying evidence
-- Heirarchical models with regressors that differ across trials.
+- Hierarchical models with regressors that differ across trials.
 
 ## Reparameterisation
 
@@ -444,3 +438,7 @@ These functions aren't properly tested yet,
 and haven't been documented.
 
 
+# Support
+
+Development of Evidently was in part supported by  a research
+project grant from The Leverhulme Trust (RPG-2016-378)

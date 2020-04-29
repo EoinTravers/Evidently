@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from scipy import stats
+from scipy.stats import scoreatpercentile as sap
 
 from sklearn.neighbors import KernelDensity
 
@@ -21,12 +22,12 @@ def bw_silverman(x, kernel=None):
     return .9 * A * n ** (-0.2)
 
 
-def eval_with_kde(x, y):
+def eval_with_kde(x, y, lapse=.1):
     """Silverman Epanechnikov kernel"""
     try:
-        bw = bw_silverman(x)
+        # bw = bw_silverman(x)
         kde = stats.gaussian_kde(x, bw_method='silverman')
-        return np.log(kde.evaluate(y))
+        return np.log(kde.evaluate(y) + lapse)
     except (ValueError, ZeroDivisionError):
         return -np.inf
 #     kde_skl = KernelDensity(bandwidth=bw, kernel='epanechnikov')
@@ -35,11 +36,12 @@ def eval_with_kde(x, y):
 #     return ll
 
 def kde_loglik_1d(simulated_rts, observed_rts,
+                  lapse=.01,
                   bw_method='silverman'):
     nas = np.isnan(simulated_rts)
     prop_na = np.mean(nas)
     simulated_rts = simulated_rts[~nas]
-    ll = eval_with_kde(simulated_rts, observed_rts)
+    ll = eval_with_kde(simulated_rts, observed_rts, lapse=lapse)
     return ll
 
 def kde_loglik_multiresponse(simulated_responses, simulated_rts,

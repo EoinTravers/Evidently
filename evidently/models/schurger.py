@@ -29,6 +29,7 @@ def run_schurger(pars, n=50, dt=.001, nt=12000, a=1.):
         X: State of accumulator over time (np.array:  n x nt)
         response: 1 if threshold crossed, 0 otherwise.
         rt: Time of threshold crossing, in seconds, or np.NaN
+
     '''
     t0, v, k, z, a, c = pars
     times = np.arange(nt)
