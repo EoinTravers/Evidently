@@ -162,9 +162,9 @@ class Wald(BaseModel):
         self.name = 'Wald Drift Diffusion Model'
 
 
-# Heirarchical version
+# Hierarchical version
 def run_hddm(pars, lower_bound=True, n=50, dt=.001, nt=5000, c=.1):
-    '''Run Heirarchical Drift Diffusion trials, with(out) a lower response bound.
+    '''Run Hierarchical Drift Diffusion trials, with(out) a lower response bound.
 
     Args:
         pars: Model parameters
@@ -230,7 +230,7 @@ def run_hwald(pars, n=50, dt=.001, nt=5000):
 
 
 class HDiffusion(BaseModel):
-    '''The Heirarchical Drift Diffusion model.
+    '''The Hierarchical Drift Diffusion model.
 
     This model is based on `evidently.models.Diffusion`,
     but instead of setting every parameter to a fixed value,
@@ -269,7 +269,7 @@ class HDiffusion(BaseModel):
     | a ~ Gamma*(m_a, s_a);
 
     Gamma*(m, s) denotes random samples from a Gamma distribution with
-    mean s and standard deviation s. See
+    mean m and standard deviation s. See
     `evidently.utils.random_gamma` for details. We use the Gamma
     distribution for parameters that must be positive.
 
@@ -304,11 +304,11 @@ class HDiffusion(BaseModel):
                                          max_time = max_time, dt=dt,
                                          bounds=None,
                                          n_traces=1)
-        self.name = 'Heirarchical Drift Diffusion Model'
+        self.name = 'Hierarchical Drift Diffusion Model'
 
 
 class HWald(BaseModel):
-    '''The Heirarchical Wald Diffusion model.
+    '''The Hierarchical Wald Diffusion model.
 
     All details are the same as `evidently.models.HDiffusion`, except
     there is no lower response boundary.
@@ -339,4 +339,4 @@ class HWald(BaseModel):
                                          max_time = max_time, dt=dt,
                                          bounds=None,
                                          n_traces=1)
-        self.name = 'Heirarchical Wald Diffusion Model'
+        self.name = 'Hierarchical Wald Diffusion Model'
